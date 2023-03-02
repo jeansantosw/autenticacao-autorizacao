@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState } from 'react'
-import { api } from '../lib/axios'
+import { api } from '../../lib/axios'
 
 type User = {
   email: string
@@ -37,6 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { permissions, roles } = response.data
 
       setUser({ email, permissions, roles })
+      console.log('Usuario logado: ', user, isAuthenticated)
     } catch (error) {
       console.log(error)
     }
