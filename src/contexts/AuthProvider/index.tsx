@@ -6,6 +6,7 @@ import {
   SignInCredentials,
   User,
 } from './types'
+import { LoginRequest } from './utils'
 
 export const AuthContext = createContext({} as AuthContextData)
 
@@ -14,18 +15,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticated = !!user
 
   async function signIn({ email, password }: SignInCredentials) {
-    try {
-      const response = await api.post('sessions', {
-        email,
-        password,
-      })
-      const { permissions, roles } = response.data
-
-      setUser({ email, permissions, roles })
-      console.log('Usuario logado: ', user, isAuthenticated)
-    } catch (error) {
-      console.log(error)
-    }
+    const response = await LoginRequest({ email, password })
+    console.log(response)
   }
 
   return (
