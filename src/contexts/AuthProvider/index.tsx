@@ -1,26 +1,11 @@
-import { ReactNode, createContext, useState } from 'react'
+import { createContext, useState } from 'react'
 import { api } from '../../lib/axios'
-
-type User = {
-  email: string
-  permissions: string[]
-  roles: string[]
-}
-
-interface SignInCredentials {
-  email: string
-  password: string
-}
-
-interface AuthContextData {
-  signIn: (credentials: SignInCredentials) => Promise<void>
-  user: User
-  isAuthenticated: boolean
-}
-
-type AuthProviderProps = {
-  children: ReactNode
-}
+import {
+  AuthContextData,
+  AuthProviderProps,
+  SignInCredentials,
+  User,
+} from './types'
 
 export const AuthContext = createContext({} as AuthContextData)
 
