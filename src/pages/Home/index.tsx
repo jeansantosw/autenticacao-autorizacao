@@ -1,11 +1,12 @@
-import { FormEvent, useContext, useState } from 'react'
-import { AuthContext } from '../../contexts/AuthProvider'
+import { FormEvent, useState } from 'react'
+import { useAuth } from '../../contexts/AuthProvider/useAuth'
+import { useNavigate } from 'react-router-dom'
 
 export function Home() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
-  const { signIn } = useContext(AuthContext)
+  const auth = useAuth()
+  const navigate = useNavigate()
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -13,7 +14,13 @@ export function Home() {
       email,
       password,
     }
-    await signIn(data)
+
+    try {
+      await auth.signIn(data)
+      navigate('/dashboard')
+    } catch (error) {
+      console.log('Invalid email or password')
+    }
   }
 
   return (
