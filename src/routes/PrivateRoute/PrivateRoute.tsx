@@ -1,9 +1,13 @@
-import { ReactNode } from 'react'
+import { IPrivateRoute } from './types'
+import { useAuth } from '../../contexts/AuthProvider/useAuth'
+import { Outlet } from 'react-router-dom'
 
-interface PrivateRouteProps {
-  children: ReactNode
-}
+export function PrivateRoute({ children }: IPrivateRoute) {
+  // const auth = useAuth()
 
-export function PrivateRoute({ children }: PrivateRouteProps) {
-  return <h1>PrivateRoute</h1>
+  // if (!auth.isAuthenticated) {
+  //   return <Outlet />
+  // }
+
+  return <>{children}</>
 }

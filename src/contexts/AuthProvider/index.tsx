@@ -11,8 +11,8 @@ import { LoginRequest } from './utils'
 export const AuthContext = createContext({} as AuthContextData)
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>()
-  const isAuthenticated = !!user
+  const [user, setUser] = useState({} as User)
+  const isAuthenticated = true
 
   async function signIn({ email, password }: SignInCredentials) {
     const response = await LoginRequest({ email, password })
@@ -20,10 +20,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const { permissions, roles } = response
 
     setUser({ email, permissions, roles })
-  }
-
-  function Logout() {
-    setUser(null)
   }
 
   return (
