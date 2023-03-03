@@ -8,5 +8,5 @@ export function PrivateRoute({ children }: IPrivateRoute) {
     return <h1>Not authorized</h1>
   }
 
-  return <>{children}</>
+  return children
 }
