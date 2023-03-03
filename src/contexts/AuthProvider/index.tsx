@@ -12,7 +12,7 @@ export const AuthContext = createContext({} as AuthContextData)
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
-  const isAuthenticated = false
+  const isAuthenticated = !!user
 
   async function signIn({ email, password }: SignInCredentials) {
     const response = await LoginRequest({ email, password })
