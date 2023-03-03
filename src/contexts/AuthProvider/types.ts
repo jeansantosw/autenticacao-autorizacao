@@ -12,9 +12,9 @@ export interface SignInCredentials {
 }
 
 export interface AuthContextData {
-  signIn: (credentials: SignInCredentials) => Promise<void>
-  user: User
+  user: User | null
   isAuthenticated: boolean
+  signIn: (credentials: SignInCredentials) => Promise<void>
 }
 
 export type AuthProviderProps = {
