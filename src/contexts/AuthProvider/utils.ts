@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 import { api } from '../../lib/axios'
 import { SignInCredentials } from './types'
 

@@ -1,11 +1,13 @@
 import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie'
+import { useNavigate } from 'react-router-dom'
 
 interface AxiosErrorResponse {
   code?: string
 }
 
 const cookies = Cookies.get('userAuth.token')
+
 let isRefreshing = false
 let failedRequests: any[] = []
 
@@ -22,6 +24,8 @@ api.interceptors.response.use(
   },
   (error: AxiosError<AxiosErrorResponse>) => {
     if (error.response?.status === 401) {
+      const navigate = useNavigate()
+
       if (error.response.data?.code === 'token.expired') {
         const refreshToken = Cookies.get('useAuth.refreshtoken')
         const originalConfig = error.config
@@ -76,7 +80,11 @@ api.interceptors.response.use(
           })
         })
       } else {
+        Cookies.remove('useAuth.refreshtoken')
+        Cookies.remove('userAuth.token')
+        navigate('/')
       }
     }
+    return Promise.reject(error)
   },
 )

@@ -8,24 +8,33 @@ import {
 } from './types'
 import { LoginRequest } from './utils'
 import { api } from '../../lib/axios'
+import { useNavigate } from 'react-router-dom'
 
 export const AuthContext = createContext({} as AuthContextData)
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const isAuthenticated = !!user
+  const navigate = useNavigate()
 
   useEffect(() => {
     const token = Cookies.get('userAuth.token')
 
     if (token) {
-      api.get('/me').then((response) => {
-        const { email, permissions, roles } = response.data
+      api
+        .get('/me')
+        .then((response) => {
+          const { email, permissions, roles } = response.data
 
-        setUser({ email, permissions, roles })
-      })
+          setUser({ email, permissions, roles })
+        })
+        .catch(() => {
+          Cookies.remove('useAuth.refreshtoken')
+          Cookies.remove('userAuth.token')
+          navigate('/')
+        })
     }
-  }, [])
+  }, [navigate])
 
   async function signIn({ email, password }: SignInCredentials) {
     const response = await LoginRequest({ email, password })
