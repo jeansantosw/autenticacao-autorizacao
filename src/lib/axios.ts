@@ -1,7 +1,13 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie'
 
+interface AxiosErrorResponse {
+  code?: string
+}
+
 const cookies = Cookies.get('userAuth.token')
+let isRefreshing = false
+let failedRequests: any[] = []
 
 export const api = axios.create({
   baseURL: 'http://localhost:3333/',
@@ -9,3 +15,68 @@ export const api = axios.create({
     Authorization: `Bearer ${cookies}`,
   },
 })
+
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error: AxiosError<AxiosErrorResponse>) => {
+    if (error.response?.status === 401) {
+      if (error.response.data?.code === 'token.expired') {
+        const refreshToken = Cookies.get('useAuth.refreshtoken')
+        const originalConfig = error.config
+
+        if (!isRefreshing) {
+          console.log(!isRefreshing)
+          isRefreshing = true
+
+          api
+            .post('/refresh', { refreshToken })
+            .then((response) => {
+              const { token } = response.data
+              Cookies.set('userAuth.token', token, {
+                expires: 1,
+                path: '/',
+              })
+              Cookies.set('useAuth.refreshtoken', response.data.refreshToken, {
+                expires: 1,
+                path: '/',
+              })
+              api.defaults.headers.Authorization = `Bearer ${token}`
+
+              failedRequests.forEach((request) => {
+                request.onSuccess(token)
+              })
+              failedRequests = []
+            })
+            .catch((err) => {
+              failedRequests.forEach((request) => {
+                request.onFailure(err)
+              })
+              failedRequests = []
+            })
+            .finally(() => {
+              isRefreshing = false
+            })
+        }
+        return new Promise((resolve, reject) => {
+          failedRequests.push({
+            onSuccess: (token: string) => {
+              if (!originalConfig?.headers) {
+                return
+              }
+
+              originalConfig.headers.Authorization = `Bearer ${token}`
+
+              resolve(api(originalConfig))
+            },
+            onFailure: (error: AxiosError) => {
+              reject(error)
+            },
+          })
+        })
+      } else {
+      }
+    }
+  },
+)
