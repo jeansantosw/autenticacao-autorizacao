@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import {
   AuthContextData,
@@ -12,10 +12,28 @@ import { useNavigate } from 'react-router-dom'
 
 export const AuthContext = createContext({} as AuthContextData)
 
+const authChannel = new BroadcastChannel('auth')
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const isAuthenticated = !!user
   const navigate = useNavigate()
+
+  function signOut() {
+    Cookies.remove('useAuth.refreshtoken')
+    Cookies.remove('userAuth.token')
+    navigate('/')
+    authChannel.postMessage('signOut')
+  }
+
+  useEffect(() => {
+    authChannel.onmessage = (message) => {
+      console.log(message.data)
+      if (message.data === 'signOut') {
+        navigate('/')
+      }
+    }
+  }, [navigate])
 
   useEffect(() => {
     const token = Cookies.get('userAuth.token')
@@ -56,7 +74,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider value={{ signIn, isAuthenticated, user }}>
+    <AuthContext.Provider value={{ signIn, signOut, isAuthenticated, user }}>
       {children}
     </AuthContext.Provider>
   )

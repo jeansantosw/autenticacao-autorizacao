@@ -1,6 +1,5 @@
 import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie'
-import { useNavigate } from 'react-router-dom'
 
 interface AxiosErrorResponse {
   code?: string
