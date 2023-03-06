@@ -6,7 +6,7 @@ interface AxiosErrorResponse {
   code?: string
 }
 
-const cookies = Cookies.get('userAuth.token')
+const cookies = Cookies.get()
 
 let isRefreshing = false
 let failedRequests: any[] = []
@@ -14,7 +14,7 @@ let failedRequests: any[] = []
 export const api = axios.create({
   baseURL: 'http://localhost:3333/',
   headers: {
-    Authorization: `Bearer ${cookies}`,
+    Authorization: `Bearer ${cookies['userAuth.token']}`,
   },
 })
 
@@ -24,14 +24,11 @@ api.interceptors.response.use(
   },
   (error: AxiosError<AxiosErrorResponse>) => {
     if (error.response?.status === 401) {
-      const navigate = useNavigate()
-
       if (error.response.data?.code === 'token.expired') {
         const refreshToken = Cookies.get('useAuth.refreshtoken')
         const originalConfig = error.config
 
         if (!isRefreshing) {
-          console.log(!isRefreshing)
           isRefreshing = true
 
           api
@@ -82,7 +79,6 @@ api.interceptors.response.use(
       } else {
         Cookies.remove('useAuth.refreshtoken')
         Cookies.remove('userAuth.token')
-        navigate('/')
       }
     }
     return Promise.reject(error)
